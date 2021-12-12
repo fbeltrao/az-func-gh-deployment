@@ -43,3 +43,44 @@ jobs:
 
       - name: Terraform apply
         run: terraform apply -auto-approve plan.tfdata
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [deploy-stage]
+    environment:
+      name: production
+    defaults:
+      run:
+        working-directory: './infrastructure'
+    env:
+      TARGET_ENVIRONMENT: stage
+      ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
+      ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
+      ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
+      ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
+      TF_VAR_secret_1: ${{ secrets.SECRET_1 }}
+      TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
+      TF_VAR_name_prefix: ${{ secrets.DEPLOYMENT_NAME_PREFIX }}
+
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1.2.1
+
+      - name: Terraform fmt
+        run: terraform fmt -check
+
+      - name: Terraform init
+        run: terraform init -backend-config="storage_account_name=${{ secrets.TFSTATE_STORAGE_ACCOUNT_NAME }}" -backend-config="${{ env.TARGET_ENVIRONMENT }}.tfbackend"
+
+      - name: Terraform validate
+        run: terraform validate -no-color
+
+      - name: Terraform plan
+        run: terraform plan -var-file="${{ env.TARGET_ENVIRONMENT }}.tfvars" -no-color -out=plan.tfdata
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve plan.tfdata
