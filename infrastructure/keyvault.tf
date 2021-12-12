@@ -1,5 +1,3 @@
-data "azurerm_client_config" "current" {}
-
 # Key vault enables the storage and retrival of secrets in a secure manner.
 resource "azurerm_key_vault" "main" {
   name                = "kv-${var.name_prefix}-${var.environment}"
