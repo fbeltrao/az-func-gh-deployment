@@ -35,3 +35,9 @@ variable "setting_1" {
   default     = "100"
 }
 
+
+variable "key_vault_enable_deployers" {
+  description = "Enable deployers"
+  default     = "false"
+  type        = "boolean"
+}
