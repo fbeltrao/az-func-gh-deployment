@@ -1,3 +1,5 @@
+data "azurerm_client_config" "current" {}
+
 # Key vault enables the storage and retrival of secrets in a secure manner.
 resource "azurerm_key_vault" "main" {
   name                = "kv-${var.name_prefix}-${var.environment}"
@@ -28,10 +30,16 @@ resource "azurerm_key_vault_secret" "secret_2" {
   ]
 }
 
-# adminstration access for use from terraform CLI 
-resource "azurerm_key_vault_access_policy" "terraform_client" {
-  key_vault_id       = azurerm_key_vault.main.id
-  object_id          = data.azurerm_client_config.current.object_id
-  tenant_id          = data.azurerm_client_config.current.tenant_id
-  secret_permissions = ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore"]
+# Create a Azure Key Vault access policy with Admin permissions
+# This policy must be kept for a proper run of the "destroy" process
+resource "azurerm_key_vault_access_policy" "default_policy" {
+  key_vault_id = azurerm_key_vault.main.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = data.azurerm_client_config.current.object_id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  secret_permissions = ["backup", "delete", "get", "list", "purge", "recover", "restore", "set"]
 }
