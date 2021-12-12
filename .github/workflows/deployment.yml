@@ -26,20 +26,20 @@ jobs:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v2
 
-      - name: 'HashiCorp - Setup Terraform'
+      - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1.2.1
 
-      - name: Format
+      - name: Terraform fmt
         run: terraform fmt -check
 
-      - name: Init
+      - name: Terraform init
         run: terraform init -backend-config="storage_account_name=${{ secrets.TFSTATE_STORAGE_ACCOUNT_NAME }}" -backend-config="${{ env.TARGET_ENVIRONMENT }}.tfbackend"
 
-      - name: Validate
+      - name: Terraform validate
         run: terraform validate -no-color
 
-      - name: Plan
+      - name: Terraform plan
         run: terraform plan -var-file="${{ env.TARGET_ENVIRONMENT }}.tfvars" -no-color -out=plan.tfdata
 
-      - name: Apply
-        run: terraform apply -var-file="${{ env.TARGET_ENVIRONMENT }}.tfvars" -auto-approve plan.tfdata
+      - name: Terraform apply
+        run: terraform apply -auto-approve plan.tfdata
