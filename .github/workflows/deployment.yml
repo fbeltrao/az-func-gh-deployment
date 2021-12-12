@@ -4,13 +4,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy-stage:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    environment:
+      name: stage
     defaults:
       run:
         working-directory: './infrastructure'
     env:
+      TARGET_ENVIRONMENT: $${{jobs.deploy-stage.environment}}
       ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
       ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
       ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
@@ -31,13 +34,13 @@ jobs:
         run: terraform fmt -check
 
       - name: Init
-        run: terraform init -backend-config="" -backend-config="${{environment}}.tfbackend"
+        run: terraform init -backend-config="" -backend-config="${{ env.TARGET_ENVIRONMENT }}.tfbackend"
 
       - name: Validate
         run: terraform validate -no-color
 
       - name: Plan
-        run: terraform plan -var-file="${{ environment }}.tfvars" -no-color -out=plan.tfdata
+        run: terraform plan -var-file="${{ env.TARGET_ENVIRONMENT }}.tfvars" -no-color -out=plan.tfdata
 
       - name: Apply
-        run: terraform apply -var-file="${{ environment }}.tfvars" -auto-approve plan.tfdata
+        run: terraform apply -var-file="${{ env.TARGET_ENVIRONMENT }}.tfvars" -auto-approve plan.tfdata
