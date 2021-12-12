@@ -32,7 +32,7 @@ resource "azurerm_function_app" "function_app_one" {
     # sets the framework version for Python 3.8
     linux_fx_version = "python|3.8"
   }
-  
+
   identity {
     type = "SystemAssigned"
   }
