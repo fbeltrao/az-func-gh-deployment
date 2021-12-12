@@ -12,20 +12,12 @@ resource "azurerm_key_vault_secret" "secret_1" {
   name         = "secret-1"
   value        = var.secret_1
   key_vault_id = azurerm_key_vault.main.id
-
-  depends_on = [
-    azurerm_key_vault_access_policy.terraform_client
-  ]
 }
 
 resource "azurerm_key_vault_secret" "secret_2" {
   name         = "secret-2"
   value        = var.secret_2
   key_vault_id = azurerm_key_vault.main.id
-
-  depends_on = [
-    azurerm_key_vault_access_policy.terraform_client
-  ]
 }
 
 # Create a Azure Key Vault access policy with Admin permissions

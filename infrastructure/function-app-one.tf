@@ -12,10 +12,6 @@ resource "azurerm_key_vault_secret" "function_storage_one_credentials" {
   name         = "func-one-storage-conn-string"
   value        = azurerm_storage_account.function_storage_one.primary_connection_string
   key_vault_id = azurerm_key_vault.main.id
-
-  depends_on = [
-    azurerm_key_vault_access_policy.terraform_client
-  ]
 }
 
 
