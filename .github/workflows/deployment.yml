@@ -18,10 +18,8 @@ jobs:
       ARM_CLIENT_SECRET: ${{secrets.ARM_CLIENT_SECRET}}
       ARM_TENANT_ID: ${{secrets.ARM_TENANT_ID}}
       ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
-      TFSTATE_STORAGE_ACCOUNT_NAME: ${{ secrets.TFSTATE_STORAGE_ACCOUNT_NAME }}
       TF_VAR_secret_1: ${{ secrets.SECRET_1 }}
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
-
 
     steps:
       - name: 'Checkout GitHub Action'
@@ -34,7 +32,7 @@ jobs:
         run: terraform fmt -check
 
       - name: Init
-        run: terraform init -backend-config="" -backend-config="${{ env.TARGET_ENVIRONMENT }}.tfbackend"
+        run: terraform init -backend-config="storage_account_name=${{ secrets.TFSTATE_STORAGE_ACCOUNT_NAME }}" -backend-config="${{ env.TARGET_ENVIRONMENT }}.tfbackend"
 
       - name: Validate
         run: terraform validate -no-color
