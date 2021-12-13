@@ -55,7 +55,7 @@ jobs:
         name: Checkout branch
 
       - name: Deploy Function One
-        uses: .github/actions/deploy-az-func
+        uses: ./.github/actions/deploy-az-func
         with:
           working-directory: './src/function_one'
           target-function-app: 'func-fbrfunc-one-stage'
