@@ -59,7 +59,7 @@ jobs:
         with:
           working-directory: './src/function_one'
           target-function-app: 'func-fbrfunc-one-stage'
-
+          az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
 
   deploy-production-infrastructure:
     runs-on: ubuntu-latest

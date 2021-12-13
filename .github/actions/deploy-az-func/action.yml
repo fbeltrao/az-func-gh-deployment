@@ -10,6 +10,9 @@ inputs:
   python-version:
     required: false
     default: 3.8
+  az-rbac-credentials:
+    description: Azure RBAC credentials
+    required: true    
 
 runs:
   using: "composite"
@@ -28,7 +31,7 @@ runs:
   - name: Login via Az module
     uses: azure/login@v1
     with:
-      creds: ${{secrets.AZURE_RBAC_CREDENTIALS}}
+      creds: ${{ inputs.az-rbac-credentials }}
       enable-AzPSSession: true
   - name: Azure Functions Action
     uses: Azure/functions-action@v1.4.3
