@@ -101,3 +101,20 @@ jobs:
 
       - name: Terraform apply
         run: terraform apply -auto-approve plan.tfdata
+
+  deploy-production-function:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [deploy-production-infrastructure, deploy-stage-function]
+    environment:
+      name: production
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout branch
+
+      - name: Deploy Function One
+        uses: ./.github/actions/deploy-az-func
+        with:
+          working-directory: './src/function_one'
+          target-function-app: 'func-fbrfunc-one-prod'
+          az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}        
