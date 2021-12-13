@@ -1,0 +1,40 @@
+name: Deploy Python Function
+description: Deploys an Azure Function
+inputs:
+  working-directory:
+    description: Relative path to Function App root folder
+    required: true
+  target-function-app:
+    description: Azure Function Name
+    required: true
+  python-version:
+    required: false
+    default: 3.8
+
+runs:
+  using: "composite"
+  steps:
+  - name: Setup Python ${{ inputs.python-version }} Environment
+    uses: actions/setup-python@v1
+    with:
+      python-version: ${{ inputs.python-version }}
+  - name: 'Resolve Project Dependencies Using Pip'
+    shell: bash
+    run: |
+      pushd './${{ inputs.working-directory }}'
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+      popd
+  - name: Login via Az module
+    uses: azure/login@v1
+    with:
+      creds: ${{secrets.AZURE_RBAC_CREDENTIALS}}
+      enable-AzPSSession: true
+  - name: Azure Functions Action
+    uses: Azure/functions-action@v1.4.3
+    id: fa
+    with:
+      app-name: ${{ input.target-function-app }}
+      package: ${{ inputs.working-directory }}
+      scm-do-build-during-deployment: true
+      enable-oryx-build: true

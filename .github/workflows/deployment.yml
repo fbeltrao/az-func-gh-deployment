@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-stage:
+  deploy-stage-infrastructure:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment:
@@ -44,10 +44,24 @@ jobs:
       - name: Terraform apply
         run: terraform apply -auto-approve plan.tfdata
 
-  deploy-production:
+  deploy-stage-function:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: [deploy-stage]
+    needs: [deploy-stage-infrastructure]
+    environment:
+      name: stage
+    steps:
+      - name: Deploy Function One
+        uses: ./.github/actions/deploy-az-func
+        with:
+          working-directory: './src/function_one'
+          target-function-app: 'func-fbrfunc-one-stage'
+
+
+  deploy-production-infrastructure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [deploy-stage-infrastructure]
     environment:
       name: production
     defaults:
