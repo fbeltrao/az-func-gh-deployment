@@ -1,0 +1,31 @@
+name: Function One CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/function_one/**'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/function_one/**'
+
+  # allow manually triggering
+  workflow_dispatch:      
+
+
+jobs:
+  ci:
+    name: Python CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: './src/function_one/'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./github/actions/python-ci
+
