@@ -1,2 +1,5 @@
 -e ../packages
 -r requirements.txt
+pylint
+black
+pytest
