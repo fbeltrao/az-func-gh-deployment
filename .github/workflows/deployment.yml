@@ -22,7 +22,7 @@ jobs:
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
       TF_VAR_name_prefix: ${{ secrets.DEPLOYMENT_NAME_PREFIX }}
     outputs:
-      FUNCTION_ONE_APP_NAME_OUTPUT: ${{ steps.set-tf-output.outputs.FUNCTION_ONE_APP_NAME }}
+      function-one-app-name: ${{ steps.set-tf-output.outputs.FUNCTION_ONE_APP_NAME }}
 
     steps:
       - name: 'Checkout GitHub Action'
@@ -65,13 +65,13 @@ jobs:
       - uses: actions/checkout@v2
         name: Checkout branch
 
-      - run: echo ${{ needs.deploy-stage-infrastructure.outputs.FUNCTION_ONE_APP_NAME_OUTPUT }}
+      - run: echo "${{ needs.deploy-stage-infrastructure.outputs.function-one-app-name }}"
 
       - name: Deploy Function One
         uses: ./.github/actions/deploy-az-func
         with:
           working-directory: './src/function_one'
-          target-function-app: ${{ needs.deploy-stage-infrastructure.outputs.FUNCTION_ONE_APP_NAME_OUTPUT }}
+          target-function-app: ${{ needs.deploy-stage-infrastructure.outputs.function-one-app-name }}
           az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
 
   deploy-production-infrastructure:
