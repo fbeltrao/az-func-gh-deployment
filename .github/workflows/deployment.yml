@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-stage-infrastructure:
+  deploy_stage_infrastructure:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment:
@@ -56,26 +56,26 @@ jobs:
   deploy-stage-function:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: [deploy-stage-infrastructure]
+    needs: [deploy_stage_infrastructure]
     environment:
       name: stage
     steps:
       - uses: actions/checkout@v2
         name: Checkout branch
 
-      - run: echo ${{ needs.deploy-stage-infrastructure.outputs.FUNCTION_ONE_APP_NAME_OUTPUT }}
+      - run: echo ${{ needs.deploy_stage_infrastructure.outputs.FUNCTION_ONE_APP_NAME_OUTPUT }}
 
       - name: Deploy Function One
         uses: ./.github/actions/deploy-az-func
         with:
           working-directory: './src/function_one'
-          target-function-app: ${{ needs.deploy-stage-infrastructure.outputs.FUNCTION_ONE_APP_NAME_OUTPUT }}
+          target-function-app: ${{ needs.deploy_stage_infrastructure.outputs.FUNCTION_ONE_APP_NAME_OUTPUT }}
           az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
 
   deploy-production-infrastructure:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: [deploy-stage-infrastructure]
+    needs: [deploy_stage_infrastructure]
     environment:
       name: production
     defaults:
