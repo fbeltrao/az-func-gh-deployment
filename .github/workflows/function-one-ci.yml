@@ -32,5 +32,6 @@ jobs:
       - uses: actions/checkout@v2
         name: Checkout branch
 
-      - uses: '.github/actions/python-ci'
+      - name: Run lint, format and tests
+        uses: ./.github/actions/python-ci
 
