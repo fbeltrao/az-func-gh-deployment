@@ -22,6 +22,8 @@ jobs:
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
       TF_VAR_name_prefix: ${{ secrets.DEPLOYMENT_NAME_PREFIX }}
 
+    outputs:
+      function_one_app_name: ${{ steps.tf_outputs.function_one_app_name }}
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v2
@@ -45,7 +47,9 @@ jobs:
         run: terraform apply -auto-approve plan.tfdata
 
       - name: Terraform get output
-        run: echo $(terraform output function_app_one_name)
+        id: tf_outputs
+        run: |
+          "::set-output name=function_one_app_name::$(terraform output function_app_one_name)"
 
   deploy-stage-function:
     runs-on: ubuntu-latest
@@ -61,7 +65,7 @@ jobs:
         uses: ./.github/actions/deploy-az-func
         with:
           working-directory: './src/function_one'
-          target-function-app: 'func-fbrfunc-one-stage'
+          target-function-app: ${{ needs.deploy-stage-infrastructure.function_one_app_name }}
           az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
 
   deploy-production-infrastructure:
