@@ -51,7 +51,7 @@ jobs:
       - name: Terraform get outputs
         id: set-tf-output
         run: |
-          echo "::set-output :name=FUNCTION_ONE_APP_NAME:$(terraform output function_app_one_name)"
+          echo "::set-output name=FUNCTION_ONE_APP_NAME::$(terraform output function_app_one_name)"
 
   deploy-stage-function:
     runs-on: ubuntu-latest
