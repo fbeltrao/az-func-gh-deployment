@@ -52,6 +52,7 @@ jobs:
         id: set-tf-output
         run: |
           function_app_one_name=$(terraform output function_app_one_name)
+          echo $function_app_one_name
           echo "::set-output name=FUNCTION_ONE_APP_NAME::$function_app_one_name"
 
   deploy-stage-function:
