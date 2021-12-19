@@ -44,6 +44,9 @@ jobs:
       - name: Terraform apply
         run: terraform apply -auto-approve plan.tfdata
 
+      - name: Terraform get output
+        run: echo $(terraform output function_app_one_name)
+
   deploy-stage-function:
     runs-on: ubuntu-latest
     timeout-minutes: 45
