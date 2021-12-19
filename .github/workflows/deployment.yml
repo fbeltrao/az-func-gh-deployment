@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy_stage_infrastructure:
+  deploy-stage-infrastructure:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment:
@@ -22,7 +22,7 @@ jobs:
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
       TF_VAR_name_prefix: ${{ secrets.DEPLOYMENT_NAME_PREFIX }}
     outputs:
-      FUNCTION_ONE_APP_NAME_OUTPUT: ${{ steps.step_tf_outputs.outputs.FUNCTION_ONE_APP_NAME }}
+      FUNCTION_ONE_APP_NAME_OUTPUT: ${{ steps.set-tf-output.outputs.FUNCTION_ONE_APP_NAME }}
 
     steps:
       - name: 'Checkout GitHub Action'
@@ -49,33 +49,34 @@ jobs:
         run: terraform apply -auto-approve plan.tfdata
 
       - name: Terraform get outputs
-        id: step_tf_outputs
+        id: set-tf-output
         run: |
-          echo "::set-output name=FUNCTION_ONE_APP_NAME::$(terraform output function_app_one_name)"
+          echo "::set-output :name=FUNCTION_ONE_APP_NAME:$(terraform output function_app_one_name)"
 
   deploy-stage-function:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: [deploy_stage_infrastructure]
+    needs: [deploy-stage-infrastructure]
+    if: ${{ needs.deploy-stage-infrastructure.outputs.FUNCTION_ONE_APP_NAME_OUTPUT }}
     environment:
       name: stage
     steps:
       - uses: actions/checkout@v2
         name: Checkout branch
 
-      - run: echo ${{ needs.deploy_stage_infrastructure.outputs.FUNCTION_ONE_APP_NAME_OUTPUT }}
+      - run: echo ${{ needs.deploy-stage-infrastructure.outputs.FUNCTION_ONE_APP_NAME_OUTPUT }}
 
       - name: Deploy Function One
         uses: ./.github/actions/deploy-az-func
         with:
           working-directory: './src/function_one'
-          target-function-app: ${{ needs.deploy_stage_infrastructure.outputs.FUNCTION_ONE_APP_NAME_OUTPUT }}
+          target-function-app: ${{ needs.deploy-stage-infrastructure.outputs.FUNCTION_ONE_APP_NAME_OUTPUT }}
           az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
 
   deploy-production-infrastructure:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: [deploy_stage_infrastructure]
+    needs: [deploy-stage-infrastructure]
     environment:
       name: production
     defaults:
