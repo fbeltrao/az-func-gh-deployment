@@ -24,14 +24,13 @@ jobs:
     name: Python CI
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: './src/function_one/'
     steps:
      
       - uses: actions/checkout@v2
         name: Checkout branch
 
-      - name: Run lint, format and tests
+      - name: Run lint, format and tests      
         uses: ./.github/actions/python-ci
+        with:
+          working-directory: './src/function_one'
 
