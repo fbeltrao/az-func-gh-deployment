@@ -22,7 +22,7 @@ jobs:
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
       TF_VAR_name_prefix: ${{ secrets.DEPLOYMENT_NAME_PREFIX }}
     outputs:
-      FUNCTION_ONE_APP_NAME: ${{ steps.tf_outputs.FUNCTION_ONE_APP_NAME }}
+      FUNCTION_ONE_APP_NAME: ${{ steps.tf_outputs.outputs.FUNCTION_ONE_APP_NAME }}
 
     steps:
       - name: 'Checkout GitHub Action'
