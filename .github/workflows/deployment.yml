@@ -69,7 +69,7 @@ jobs:
         uses: ./.github/actions/deploy-az-func
         with:
           working-directory: './src/function_one'
-          target-function-app: ${{ needs.deploy-stage-infrastructure.FUNCTION_ONE_APP_NAME }}
+          target-function-app: ${{ needs.deploy-stage-infrastructure.outputs.FUNCTION_ONE_APP_NAME }}
           az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
 
   deploy-production-infrastructure:
