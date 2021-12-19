@@ -21,9 +21,9 @@ jobs:
       TF_VAR_secret_1: ${{ secrets.SECRET_1 }}
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
       TF_VAR_name_prefix: ${{ secrets.DEPLOYMENT_NAME_PREFIX }}
-
     outputs:
       FUNCTION_ONE_APP_NAME: ${{ steps.tf_outputs.FUNCTION_ONE_APP_NAME }}
+
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v2
@@ -51,8 +51,9 @@ jobs:
       - name: Terraform get output
         id: tf_outputs
         run: |
-          function_app_one_name=$(terraform output function_app_one_name)
-          echo "::set-output name=FUNCTION_ONE_APP_NAME::$function_app_one_name"
+          FUNCTION_ONE_APP_NAME=$(terraform output function_app_one_name)
+          echo $FUNCTION_ONE_APP_NAME
+          echo "::set-output name=FUNCTION_ONE_APP_NAME::$FUNCTION_ONE_APP_NAME"
 
   deploy-stage-function:
     runs-on: ubuntu-latest
@@ -80,6 +81,9 @@ jobs:
     defaults:
       run:
         working-directory: './infrastructure'
+    outputs:
+      FUNCTION_ONE_APP_NAME: ${{ steps.tf_outputs.FUNCTION_ONE_APP_NAME }}
+
     env:
       TARGET_ENVIRONMENT: production
       ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
@@ -113,3 +117,9 @@ jobs:
 
       - name: Terraform apply
         run: terraform apply -auto-approve plan.tfdata
+
+      - name: Terraform get output
+        id: tf_outputs
+        run: |
+          function_app_one_name=$(terraform output function_app_one_name)
+          echo "::set-output name=FUNCTION_ONE_APP_NAME::$function_app_one_name"        
