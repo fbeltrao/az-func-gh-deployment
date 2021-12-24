@@ -2,6 +2,12 @@ name: Deployment
 
 on:
   workflow_dispatch:
+    inputs:
+      forceDeployStage:
+        description: 'Indicates if we should deploy to stage regardless'
+        required: false
+        default: false
+
 
   push:
     branches:
@@ -66,7 +72,7 @@ jobs:
         # Allow merges or dispatchs to be deployed to staging environment
         # To only allow merges we should use
         # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        if: github.event_name != 'pull_request'
+        if: github.event.input.forceDeployStage || github.event_name != 'pull_request'
         id: tf-apply
         run: terraform apply -auto-approve plan.tfdata
 
@@ -80,7 +86,7 @@ jobs:
           
 
   deploy-stage-function:
-    if: github.event_name != 'pull_request'
+    if: github.event.input.forceDeployStage || github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: [deploy-stage-infrastructure]
@@ -96,6 +102,21 @@ jobs:
           working-directory: './src/function_one'
           target-function-app: ${{ needs.deploy-stage-infrastructure.outputs.function_app_one_name }}
           az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
+
+  stage-end-to-end-tests:
+    runs-on: ubuntu-latest
+    needs: [deploy-stage-infrastructure, deploy-stage-function]
+    environment:
+      name: stage
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout branch
+
+      - name: Run tests
+        uses: ./.github/actions/e2e-tests
+        with:
+          function_app_one_name: ${{ needs.deploy-stage-infrastructure.outputs.function_app_one_name }}
+          function_app_one_key: ${{ needs.deploy-stage-infrastructure.outputs.function_app_one_key }}
 
   deploy-production-infrastructure:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
