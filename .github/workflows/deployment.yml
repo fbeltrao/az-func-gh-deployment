@@ -86,8 +86,6 @@ jobs:
       - uses: actions/checkout@v2
         name: Checkout branch
 
-      - run: echo "${{ needs.deploy-stage-infrastructure.outputs.function_app_one_name }}"
-
       - name: Deploy Function One
         uses: ./.github/actions/deploy-az-func
         with:
@@ -106,7 +104,7 @@ jobs:
       run:
         working-directory: './infrastructure'
     outputs:
-      function_app_one_name: ${{ steps.tf_outputs.function_app_one_name }}
+      function_app_one_name: ${{ steps.set-tf-output.outputs.function_app_one_name }}
 
     env:
       TARGET_ENVIRONMENT: production
@@ -140,11 +138,11 @@ jobs:
       - name: Terraform apply
         run: terraform apply -auto-approve plan.tfdata
 
-      - name: Terraform get output
-        id: tf_outputs
+      - id: set-tf-output
+        name: Terraform get outputs
         run: |
-          function_app_one_name=$(terraform output function_app_one_name)
-          echo "::set-output name=function_app_one_name::$function_app_one_name"
+          functionAppOneName=$(terraform output -raw function_app_one_name)
+          echo "::set-output name=function_app_one_name::$functionAppOneName"
 
   deploy-production-function:
     runs-on: ubuntu-latest
@@ -155,8 +153,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         name: Checkout branch
-
-      - run: echo "${{ needs.deploy-production-infrastructure.outputs.function_app_one_name }}"
 
       - name: Deploy Function One
         uses: ./.github/actions/deploy-az-func
