@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-stage-infrastructure:
+  deploy_stage_infrastructure:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment:
@@ -22,7 +22,7 @@ jobs:
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
       TF_VAR_name_prefix: ${{ secrets.DEPLOYMENT_NAME_PREFIX }}
     outputs:
-      function_app_one_name: ${{ steps.set-tf-output.outputs.function_app_one_name }}
+      function_app_one_name: ${{ steps.set_tf_output.outputs.function_app_one_name }}
 
     steps:
       - name: 'Checkout GitHub Action'
@@ -48,7 +48,7 @@ jobs:
       - name: Terraform apply
         run: terraform apply -auto-approve plan.tfdata
 
-      - id: set-tf-output
+      - id: set_tf_output
         name: Terraform get outputs
         run: |
           functionAppOneName=$(terraform output -raw function_app_one_name)
@@ -60,26 +60,26 @@ jobs:
   deploy-stage-function:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: [deploy-stage-infrastructure]
+    needs: [deploy_stage_infrastructure]
     environment:
       name: stage
     steps:
       - uses: actions/checkout@v2
         name: Checkout branch
 
-      - run: echo "${{ needs.deploy-stage-infrastructure.outputs.function_app_one_name }}"
+      - run: echo "${{ needs.deploy_stage_infrastructure.outputs.function_app_one_name }}"
 
       - name: Deploy Function One
         uses: ./.github/actions/deploy-az-func
         with:
           working-directory: './src/function_one'
-          target-function-app: ${{ needs.deploy-stage-infrastructure.outputs.function_app_one_name }}
+          target-function-app: ${{ needs.deploy_stage_infrastructure.outputs.function_app_one_name }}
           az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
 
   deploy-production-infrastructure:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: [deploy-stage-infrastructure]
+    needs: [deploy_stage_infrastructure]
     environment:
       name: production
     defaults:
