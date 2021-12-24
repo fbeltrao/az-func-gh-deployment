@@ -1,5 +1,7 @@
 import pytest
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
 
 @pytest.fixture(scope="session")
 def function_one_url():    
@@ -13,7 +15,17 @@ def test_can_call_function_one(function_one_url: str) -> None:
         pytest.skip("No function_one_url provided")
 
     # Act
-    res = requests.get(url=function_one_url)
+    retry_strategy = Retry(
+        total=3,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["HEAD", "GET", "OPTIONS"]
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    http = requests.Session()
+    http.mount("https://", adapter)
+    http.mount("http://", adapter)
+
+    res = http.get(url=function_one_url)
     
     # Assert
     assert res.status_code == 200
