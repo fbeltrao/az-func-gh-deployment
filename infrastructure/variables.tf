@@ -2,7 +2,7 @@ variable "name_prefix" {
   description = "A unique prefix"
   default     = "fbr"
   validation {
-    condition     = length(var.name_prefix) >= 3 || length(var.name_prefix) > 10
+    condition     = length(var.name_prefix) > 2 && length(var.name_prefix) < 11
     error_message = "The name_prefix length must be between 3 and 10 characters."
   }
 }
