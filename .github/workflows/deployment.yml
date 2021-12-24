@@ -3,6 +3,21 @@ name: Deployment
 on:
   workflow_dispatch:
 
+  push:
+    branches:
+      - main
+    # redeploy if a python file or infrastructure changed
+    paths:
+      - 'src/**/*.py'
+      - 'infrastructure/**'
+
+  # run PR validation if the infrastructure changed
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'infrastructure/**'
+
 jobs:
   deploy-stage-infrastructure:
     runs-on: ubuntu-latest
@@ -45,6 +60,10 @@ jobs:
         run: terraform plan -var-file="${{ env.TARGET_ENVIRONMENT }}.tfvars" -no-color -out=plan.tfdata
 
       - name: Terraform apply
+        # Allow merges or dispatchs to be deployed to staging environment
+        # To only allow merges we should use
+        # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.event_name != 'pull_request'
         run: terraform apply -auto-approve plan.tfdata
 
       - id: set-tf-output
@@ -55,6 +74,7 @@ jobs:
           
 
   deploy-stage-function:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: [deploy-stage-infrastructure]
@@ -74,6 +94,7 @@ jobs:
           az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
 
   deploy-production-infrastructure:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: [deploy-stage-infrastructure]
@@ -121,4 +142,23 @@ jobs:
         id: tf_outputs
         run: |
           function_app_one_name=$(terraform output function_app_one_name)
-          echo "::set-output name=function_app_one_name::$function_app_one_name"        
+          echo "::set-output name=function_app_one_name::$function_app_one_name"
+
+  deploy-production-function:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [deploy-production-infrastructure]
+    environment:
+      name: production
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout branch
+
+      - run: echo "${{ needs.deploy-production-infrastructure.outputs.function_app_one_name }}"
+
+      - name: Deploy Function One
+        uses: ./.github/actions/deploy-az-func
+        with:
+          working-directory: './src/function_one'
+          target-function-app: ${{ needs.deploy-production-infrastructure.outputs.function_app_one_name }}
+          az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
