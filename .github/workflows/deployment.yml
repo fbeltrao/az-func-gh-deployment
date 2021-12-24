@@ -20,7 +20,6 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
       TF_VAR_secret_1: ${{ secrets.SECRET_1 }}
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
-      TF_VAR_name_prefix: ${{ secrets.DEPLOYMENT_NAME_PREFIX }}
     outputs:
       function_app_one_name: ${{ steps.set_tf_output.outputs.function_app_one_name }}
 
@@ -96,8 +95,6 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
       TF_VAR_secret_1: ${{ secrets.SECRET_1 }}
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
-      TF_VAR_name_prefix: ${{ secrets.DEPLOYMENT_NAME_PREFIX }}
-
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v2
