@@ -51,7 +51,7 @@ jobs:
       - id: set-tf-output
         name: Terraform get outputs
         run: |
-          functionAppOneName=$(terraform output function_app_one_name)
+          functionAppOneName=$(terraform output -raw function_app_one_name)
           echo $functionAppOneName
           echo "__set-output name=function_app_one_name__$functionAppOneName"
           echo "::set-output name=function_app_one_name::$functionAppOneName"
