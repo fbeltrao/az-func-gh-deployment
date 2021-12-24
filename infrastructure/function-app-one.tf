@@ -27,8 +27,8 @@ resource "azurerm_function_app" "function_app_one" {
   os_type                   = "linux"
 
   site_config {
-    # sets the framework version for Python 3.8
-    linux_fx_version = "python|3.8"
+    # sets the framework version for Python 3.9
+    linux_fx_version = "python|3.9"
   }
 
   identity {
@@ -36,13 +36,21 @@ resource "azurerm_function_app" "function_app_one" {
   }
 
   app_settings = {
-    FUNCTIONS_WORKER_RUNTIME       = "python"
-    AzureWebJobsStorage            = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.main.name};SecretName=${azurerm_key_vault_secret.function_storage_one_credentials.name})",
-    APPINSIGHTS_INSTRUMENTATIONKEY = azurerm_application_insights.main.instrumentation_key
-    MY_SECRET_1                    = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.main.name};SecretName=${azurerm_key_vault_secret.secret_1.name})",
-    MY_SECRET_2                    = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.main.name};SecretName=${azurerm_key_vault_secret.secret_2.name})",
-    MY_SETTTING                    = var.setting_1
+    FUNCTIONS_WORKER_RUNTIME        = "python"
+    AzureWebJobsStorage             = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.main.name};SecretName=${azurerm_key_vault_secret.function_storage_one_credentials.name})"
+    APPINSIGHTS_INSTRUMENTATIONKEY  = azurerm_application_insights.main.instrumentation_key
+    PYTHON_ENABLE_WORKER_EXTENSIONS = "1"
+    WEBSITE_ENABLE_SYNC_UPDATE_SITE = "true"
+    MY_SECRET_1                     = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.main.name};SecretName=${azurerm_key_vault_secret.secret_1.name})"
+    MY_SECRET_2                     = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.main.name};SecretName=${azurerm_key_vault_secret.secret_2.name})"
+    MY_SETTTING                     = var.setting_1
+  }
 
+  lifecycle {
+    ignore_changes = [
+      app_settings["WEBSITE_RUN_FROM_PACKAGE"],
+      app_settings["WEBSITE_ENABLE_SYNC_UPDATE_SITE"]
+    ]
   }
 }
 

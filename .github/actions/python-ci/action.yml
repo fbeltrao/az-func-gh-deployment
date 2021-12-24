@@ -3,7 +3,7 @@ description: Format, Lint and Test Python codebase
 inputs:
   python-version:
     required: false
-    default: 3.8
+    default: 3.9
   uses_local_packages:
     required: false
     type: boolean
@@ -28,7 +28,7 @@ runs:
     - name: Run pylint linter        
       shell: bash
       working-directory: ${{ inputs.working-directory }}
-      run: python -m pylint $(git ls-files ./**/*.py)
+      run: python -m pylint $(git ls-files "./**/*.py")
 
     - name: Run black formatter
       shell: bash

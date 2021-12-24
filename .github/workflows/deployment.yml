@@ -64,9 +64,11 @@ jobs:
         # To only allow merges we should use
         # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         if: github.event_name != 'pull_request'
+        id: tf-apply
         run: terraform apply -auto-approve plan.tfdata
 
       - id: set-tf-output
+        if: steps.tf-apply.outcome == 'success'
         name: Terraform get outputs
         run: |
           functionAppOneName=$(terraform output -raw function_app_one_name)
