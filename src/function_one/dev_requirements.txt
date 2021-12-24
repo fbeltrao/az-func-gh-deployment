@@ -1,4 +1,3 @@
--e ../packages
 -r requirements.txt
 black==21.12b0
 pylint==2.12.2
