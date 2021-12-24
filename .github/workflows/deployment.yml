@@ -10,6 +10,7 @@ on:
     paths:
       - 'src/**/*.py'
       - 'infrastructure/**'
+      - '.github/workflows/deployment.yml'
 
   # run PR validation if the infrastructure changed
   pull_request:
@@ -17,6 +18,7 @@ on:
       - main
     paths:
       - 'infrastructure/**'
+      - '.github/workflows/deployment.yml'
 
 jobs:
   deploy-stage-infrastructure:
@@ -37,6 +39,7 @@ jobs:
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
     outputs:
       function_app_one_name: ${{ steps.set-tf-output.outputs.function_app_one_name }}
+      function_app_one_key: ${{ steps.set-tf-output.outputs.function_app_one_key }}
 
     steps:
       - name: 'Checkout GitHub Action'
@@ -73,6 +76,7 @@ jobs:
         run: |
           functionAppOneName=$(terraform output -raw function_app_one_name)
           echo "::set-output name=function_app_one_name::$functionAppOneName"
+          echo "::set-output name=function_app_one_name::$(terraform output -raw function_app_one_key)"
           
 
   deploy-stage-function:

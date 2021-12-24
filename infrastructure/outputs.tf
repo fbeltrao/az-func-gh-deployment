@@ -5,6 +5,5 @@ output "function_app_one_name" {
 
 output "function_app_one_key" {
   description = "Function app one key"
-  value       = function_app_one_keys
-  
+  value       = data.azurerm_function_app_host_keys.function_app_one_keys.default_function_key
 }

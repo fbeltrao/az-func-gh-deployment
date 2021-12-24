@@ -68,8 +68,8 @@ resource "azurerm_key_vault_access_policy" "function_app_one" {
 }
 
 data "azurerm_function_app_host_keys" "function_app_one_keys" {
-  name                = "function_app_one_keys"
-  resource_group_name = azurerm_resource_group.main.name  
+  name                = azurerm_function_app.function_app_one.name
+  resource_group_name = azurerm_resource_group.main.name
   depends_on = [
     azurerm_function_app.function_app_one
   ]
