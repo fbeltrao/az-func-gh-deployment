@@ -9,7 +9,7 @@ inputs:
     required: true
   python-version:
     required: false
-    default: 3.8
+    default: 3.9
   az-rbac-credentials:
     description: Azure RBAC credentials
     required: true    
