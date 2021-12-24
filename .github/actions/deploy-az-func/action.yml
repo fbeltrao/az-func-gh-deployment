@@ -24,9 +24,9 @@ runs:
   - name: 'Resolve Project Dependencies Using Pip'
     shell: bash
     run: |
-      pushd './${{ inputs.working-directory }}'
+      pushd '${{ inputs.working-directory }}'
       python -m pip install --upgrade pip
-      pip install -r requirements.txt --target=".python_packages/lib/site-packages"      
+      pip install -r deploy_requirements.txt --target=".python_packages/lib/site-packages"
       pip install ../packages/ --target=".python_packages/lib/site-packages"
       popd
   - name: Login via Az module

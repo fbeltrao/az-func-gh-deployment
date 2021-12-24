@@ -20,7 +20,8 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
       TF_VAR_secret_1: ${{ secrets.SECRET_1 }}
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
-      TF_VAR_name_prefix: ${{ secrets.DEPLOYMENT_NAME_PREFIX }}
+    outputs:
+      function_app_one_name: ${{ steps.set-tf-output.outputs.function_app_one_name }}
 
     steps:
       - name: 'Checkout GitHub Action'
@@ -28,6 +29,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1.2.1
+        with:
+          terraform_wrapper: false
 
       - name: Terraform fmt
         run: terraform fmt -check
@@ -43,6 +46,13 @@ jobs:
 
       - name: Terraform apply
         run: terraform apply -auto-approve plan.tfdata
+
+      - id: set-tf-output
+        name: Terraform get outputs
+        run: |
+          functionAppOneName=$(terraform output -raw function_app_one_name)
+          echo "::set-output name=function_app_one_name::$functionAppOneName"
+          
 
   deploy-stage-function:
     runs-on: ubuntu-latest
@@ -54,11 +64,13 @@ jobs:
       - uses: actions/checkout@v2
         name: Checkout branch
 
+      - run: echo "${{ needs.deploy-stage-infrastructure.outputs.function_app_one_name }}"
+
       - name: Deploy Function One
         uses: ./.github/actions/deploy-az-func
         with:
           working-directory: './src/function_one'
-          target-function-app: 'func-fbrfunc-one-stage'
+          target-function-app: ${{ needs.deploy-stage-infrastructure.outputs.function_app_one_name }}
           az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
 
   deploy-production-infrastructure:
@@ -70,6 +82,9 @@ jobs:
     defaults:
       run:
         working-directory: './infrastructure'
+    outputs:
+      function_app_one_name: ${{ steps.tf_outputs.function_app_one_name }}
+
     env:
       TARGET_ENVIRONMENT: production
       ARM_CLIENT_ID: ${{secrets.ARM_CLIENT_ID}}
@@ -78,14 +93,14 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{secrets.ARM_SUBSCRIPTION_ID}}
       TF_VAR_secret_1: ${{ secrets.SECRET_1 }}
       TF_VAR_secret_2: ${{ secrets.SECRET_2 }}
-      TF_VAR_name_prefix: ${{ secrets.DEPLOYMENT_NAME_PREFIX }}
-
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v2
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1.2.1
+        with:
+          terraform_wrapper: false
 
       - name: Terraform fmt
         run: terraform fmt -check
@@ -101,3 +116,9 @@ jobs:
 
       - name: Terraform apply
         run: terraform apply -auto-approve plan.tfdata
+
+      - name: Terraform get output
+        id: tf_outputs
+        run: |
+          function_app_one_name=$(terraform output function_app_one_name)
+          echo "::set-output name=function_app_one_name::$function_app_one_name"        

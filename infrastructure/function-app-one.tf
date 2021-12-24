@@ -55,5 +55,8 @@ resource "azurerm_key_vault_access_policy" "function_app_one" {
     "Get",
     "List",
   ]
+
+  depends_on = [azurerm_key_vault_access_policy.default_policy]
+
 }
 
