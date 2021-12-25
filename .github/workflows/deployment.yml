@@ -117,7 +117,6 @@ jobs:
 
       - name: Run tests
         uses: ./.github/actions/deploy-az-func
-        uses: ./.github/actions/e2e-tests
         with:
           function_app_one_name: ${{ needs.deploy-stage-infrastructure.outputs.function_app_one_name }}
           function_app_one_key: ${{ needs.deploy-stage-infrastructure.outputs.function_app_one_key }}
