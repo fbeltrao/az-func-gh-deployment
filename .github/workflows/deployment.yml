@@ -82,7 +82,7 @@ jobs:
         run: |
           functionAppOneName=$(terraform output -raw function_app_one_name)
           echo "::set-output name=function_app_one_name::$functionAppOneName"
-          echo "::set-output name=function_app_one_name::$(terraform output -raw function_app_one_key)"
+          echo "::set-output name=function_app_one_key::$(terraform output -raw function_app_one_key)"
           
 
   deploy-stage-function:
