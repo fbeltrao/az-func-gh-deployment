@@ -1,5 +1,5 @@
-name: Deploy Python Function
-description: Deploys an Azure Function
+name: End to end tests
+description: Execute end to end tests based on target URLs
 inputs:
   working-directory:
     description: Relative path to end to end tests
