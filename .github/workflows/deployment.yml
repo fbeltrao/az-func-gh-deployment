@@ -28,6 +28,7 @@ on:
 
 jobs:
   deploy-stage-infrastructure:
+    name: Deploy stage infrastructure
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment:
@@ -86,6 +87,7 @@ jobs:
           
 
   deploy-stage-function:
+    name: "Deploy ${{ needs.deploy-stage-infrastructure.outputs.function_app_one_name }} to stage"
     if: github.event.input.forceDeployStage || github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -104,6 +106,7 @@ jobs:
           az-rbac-credentials: ${{ secrets.AZURE_RBAC_CREDENTIALS }}
 
   stage-end-to-end-tests:
+    name: End to end tests on Stage
     runs-on: ubuntu-latest
     needs: [deploy-stage-infrastructure, deploy-stage-function]
     environment:
@@ -113,6 +116,7 @@ jobs:
         name: Checkout branch
 
       - name: Run tests
+        uses: ./.github/actions/deploy-az-func
         uses: ./.github/actions/e2e-tests
         with:
           function_app_one_name: ${{ needs.deploy-stage-infrastructure.outputs.function_app_one_name }}
