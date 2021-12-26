@@ -38,4 +38,10 @@ runs:
     - name: Run tests
       shell: bash
       working-directory: ${{ inputs.working-directory }}
-      run: python -m pytest . -vv
+      run: python -m pytest . -vv --junit-xml pytest.xml
+
+    - name: Publish Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v1
+      if: always()
+      with:
+        files: ${{ inputs.working-directory }}/pytest.xml
