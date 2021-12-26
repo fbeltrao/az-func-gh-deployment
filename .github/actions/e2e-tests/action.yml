@@ -3,6 +3,7 @@ description: Execute end to end tests based on target URLs
 inputs:
   working-directory:
     description: Relative path to end to end tests
+    required: false
     default: './src/tests'
     
   python-version:
