@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       forceDeployStage:
-        description: 'Indicates if we should deploy to stage regardless'
+        description: 'Deploy to stage?'
         required: false
         default: false
 
