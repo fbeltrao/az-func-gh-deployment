@@ -42,7 +42,6 @@ runs:
 
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v1
-      working-directory: ${{ inputs.working-directory }}
       if: always()
       with:
-        files: pytest.xml
+        files: ${{ inputs.working-directory }}/pytest.xml
